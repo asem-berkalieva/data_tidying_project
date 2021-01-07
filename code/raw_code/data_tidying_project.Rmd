@@ -5,7 +5,7 @@ date: "1/7/2021"
 output: html_document
 ---
 
-
+Here, I load in the libraries that are required to run future functions.
 ```{r setup, include=FALSE}
 ## install packages if necessary
 list.of.packages <- c("httr", "readxl", "dplyr", "tidyr", "stringr", "reshape2", "skimr", "ggplot2")
@@ -24,6 +24,8 @@ library(ggplot2)
 ```
 
 ### Get Data
+
+I collect the two datasets from online websites and save them into RDS objects in case I want to use them in the future (without having to collect from online again).
 
 [Data Set 1](https://data.world/retail/department-store-sales): Sales from the Retail Trade and Food Services Report from the US Census. This dataset only covers Department Stores, though the report covers a wide range of retail types. [1992-2016]
 
@@ -46,6 +48,7 @@ colnames(df2) <- df2[1,]
 
 ### Save Raw Data
 
+We save the data into RDS objects in our data/ directory.
 ```{r save-data, warning=FALSE} 
 ## use saveRDS() to save each object as a .rds file 
 saveRDS(df1, '../../data/raw_data/df_department.rds')
@@ -54,6 +57,7 @@ saveRDS(df2, '../../data/raw_data/df_retail.rds')
 
 ### Wrangle Data
 
+We convert the second dataframe from wide to long format. In the process of doing this, we also clean up some of the strings in variables and reformat the data to be easier and cleaner to read. We save this to a new object.
 ```{r wrangle-df2, warning=FALSE} 
 ## an example working with df2
 ## let's wrangle!
@@ -73,7 +77,7 @@ df_retail <- df2 %>%
   ## filter to only include the businesses we're interested in
   filter(business == "Retail sales, total "| business=="Department stores ")
 ```
-
+We also wrangle and clean up the first dataframe. We separate the date into month/year and record sales per year in the same format that is recorded by the second dataframe. This is also saved to a new object.
 ```{r wrangle-df1, warning=FALSE} 
 ## now, your turn!
 ## work with df1
@@ -94,14 +98,16 @@ df_department <- df1 %>%
   ## for the entire data set 
   mutate(business = 'department stores') %>%
   ## reorder column names to be : business, year, n
-  arrange(business, year, n)
+  select(business, year, n)
 ```
 
+We create a new dataset that contains information from the previous individual datasets.
 ```{r merge-data, warning=FALSE} 
 ## Now, combine the two data frames
-df_total <- function_name()
+df_total <- bind_rows(df_retail, df_department)
 ```
 
+We create scatterplots of the data from each of the three datasets to better understand what our data looks like and what patterns we see.
 ```{r plot, warning=FALSE, fig.width=10} 
 ## Plot Retail Sales data
 ggplot(df_retail, aes(x=year,y=n,colour=business)) +
